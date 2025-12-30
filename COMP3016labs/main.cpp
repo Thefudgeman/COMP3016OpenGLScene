@@ -121,17 +121,18 @@ int main()
     Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
     Shaders.use();
 
+    Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragShader.frag");
 
     // Light properties
-    Shaders.setVec3("light.position", vec3(2.0f, 4.0f, 2.0f));
+    Shaders.setVec3("light.position", vec3(0.0f, 0.0f, 0.0f));
     Shaders.setVec3("light.ambient", vec3(0.2f));
     Shaders.setVec3("light.diffuse", vec3(0.7f));
     Shaders.setVec3("light.specular", vec3(1.0f));
 
 
-
     // Camera position (needed for specular lighting)
     Shaders.setVec3("viewPos", cameraPosition);
+
 
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palm.obj");
@@ -163,7 +164,7 @@ int main()
     BiomeNoise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
     BiomeNoise.SetFrequency(0.05f);
     int biomeSeed = rand() % 100;
-    TerrainNoise.SetSeed(biomeSeed);
+    BiomeNoise.SetSeed(biomeSeed);
 
     //Generation of height map vertices
     GLfloat terrainVertices[MAP_SIZE][6];
@@ -244,26 +245,21 @@ int main()
     int rowIndicesOffset = 0;
 
     //Generation of map indices in the form of chunks (1x1 right angle triangle squares)
-    int a = 0;
+    int index = 0;
     for (int x = 0; x < RENDER_DISTANCE - 1; x++)
     {
         for (int y = 0; y < RENDER_DISTANCE - 1; y++)
         {
-            int topLeft = x * RENDER_DISTANCE + y;
-            int topRight = topLeft + 1;
-            int bottomLeft = (x + 1) * RENDER_DISTANCE + y;
-            int bottomRight = bottomLeft + 1;
-
-            terrainIndices[a][0] = x * RENDER_DISTANCE + y;
-            terrainIndices[a][1] = (x + 1) * RENDER_DISTANCE + y;
-            terrainIndices[a][2] = 1 + x * RENDER_DISTANCE + y;
-            a++;
+            terrainIndices[index][0] = x * RENDER_DISTANCE + y;
+            terrainIndices[index][1] = (x + 1) * RENDER_DISTANCE + y;
+            terrainIndices[index][2] = 1 + x * RENDER_DISTANCE + y;
+            index++;
 
             // Triangle 2 (CCW)
-            terrainIndices[a][0] = 1 + x * RENDER_DISTANCE + y;
-            terrainIndices[a][1] = (x + 1) * RENDER_DISTANCE + y;
-            terrainIndices[a][2] = 1 + (x + 1) * RENDER_DISTANCE + y;
-            a++;
+            terrainIndices[index][0] = 1 + x * RENDER_DISTANCE + y;
+            terrainIndices[index][1] = (x + 1) * RENDER_DISTANCE + y;
+            terrainIndices[index][2] = 1 + (x + 1) * RENDER_DISTANCE + y;
+            index++;
         }
     }
 
@@ -336,7 +332,8 @@ int main()
         //Viewer orientation
         view = lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //Sets the position of the viewer, the movement direction in relation to it & the world up direction
         model = mat4(1.0f);
-        SetMatrices(Shaders);
+        TerrainShaders.use();
+        SetMatricesNoLi(TerrainShaders);
 
         //Drawing
         glBindVertexArray(VAOs[0]);
@@ -344,6 +341,7 @@ int main()
         glBindVertexArray(0);
 
         //Rock (reorient MVP back to starting values)
+        Shaders.use();
         model = mat4(1.0f);
         model = translate(model, vec3(0.1f, 0.1f, 0.1f));
         model = scale(model, vec3(0.001f, 0.001f, 0.001f));
@@ -351,10 +349,12 @@ int main()
         Rock.Draw(Shaders);
 
         //Tree (changes MVP in relation to past values)
+        glActiveTexture(GL_TEXTURE0);
+
         model = mat4(1.0f);
 
         model = scale(model, vec3(0.1f, 0.1f, 0.1f));
-      //  model = translate(model, vec3(10.0f, 0.0f, 10.0f));
+        model = translate(model, vec3(10.0f, 0.0f, 10.0f));
         SetMatrices(Shaders);
         Tree.Draw(Shaders);
 
@@ -458,4 +458,12 @@ void SetMatrices(Shader& ShaderProgramIn)
 
     mat3 normalMatrix = transpose(inverse(mat3(model)));
     ShaderProgramIn.setMat3("normalMatrix", normalMatrix);
+}
+
+void SetMatricesNoLi(Shader& ShaderProgramIn)
+{
+    ShaderProgramIn.setMat4("model", model);
+    ShaderProgramIn.setMat4("view", view);
+    ShaderProgramIn.setMat4("projection", projection);
+
 }
