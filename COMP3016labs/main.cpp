@@ -99,10 +99,10 @@ int main()
     Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
     Shaders.use();
 
-    Shaders.setVec3("light.position", vec3(0.0f, 0.0f, 0.0f));
+    Shaders.setVec3("light.position", vec3(0.0f, 1.0f, 0.0f));
     Shaders.setVec3("light.ambient", vec3(0.2f));
     Shaders.setVec3("light.diffuse", vec3(0.7f));
-    Shaders.setVec3("light.specular", vec3(1.0f));
+    Shaders.setVec3("light.specular", vec3(0.2f));
 
     Shaders.setVec3("viewPos", cameraPosition);
   //  shaders.push_back(Shaders);
@@ -111,7 +111,7 @@ int main()
   //  shaders.push_back(TerrainShaders);
     TerrainShaders.use();
 
-    TerrainShaders.setVec3("light.position", vec3(3.0f, -1.0f, 3.0f));
+    TerrainShaders.setVec3("light.position", vec3(3.0f, 1.0f, 3.0f));
     TerrainShaders.setVec3("light.ambient", vec3(0.2f));
     TerrainShaders.setVec3("light.diffuse", vec3(0.7f));
     TerrainShaders.setVec3("light.specular", vec3(0.0f));
@@ -123,6 +123,7 @@ int main()
 
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palm.obj");
+    Model ForestTree("media/tree2/Small_Pine.obj");
    
 
     //Sets the viewport size within the window to match the window size of 1280x720
@@ -194,10 +195,18 @@ int main()
         glActiveTexture(GL_TEXTURE0);
 
         model = mat4(1.0f);
-        model = translate(model, vec3(1.0f, -1.0f, 1.0f));
-        model = scale(model, vec3(0.01f, 0.01f, 0.01f));
+        model = translate(model, vec3(-1.0f, 0.0f, 1.0f));
+        model = scale(model, vec3(0.1f, 0.1f, 0.1f));
         SetMatrices(Shaders);
         Tree.Draw(Shaders);
+
+        glActiveTexture(GL_TEXTURE0);
+        model = mat4(1.0f);
+        model = translate(model, vec3(2.0f, 1.0f, 0.0f));
+        model = scale(model, vec3(0.2f, 0.2f, 0.2f));
+        SetMatrices(Shaders);
+
+        ForestTree.Draw(Shaders);
 
 
         //Refreshing
