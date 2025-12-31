@@ -133,6 +133,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="LoadShaders.cpp" />
     <ClCompile Include="stbImageLoader.cpp" />
+    <ClCompile Include="Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\Public\OpenGL\include\learnopengl\mesh.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="LoadShaders.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragmentShader.frag" />

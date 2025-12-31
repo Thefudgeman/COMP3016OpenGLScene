@@ -19,6 +19,7 @@
 
 //GENERAL
 #include "main.h"
+#include "Terrain.h"
 
 #include "FastNoiseLite.h"
 
@@ -29,15 +30,7 @@ using namespace glm;
 int windowWidth;
 int windowHeight;
 
-//VAO vertex attribute positions in correspondence to vertex attribute type
-enum VAO_IDs { Triangles, Indices, Colours, Textures, NumVAOs = 2 };
-//VAOs
-GLuint VAOs[NumVAOs];
 
-//Buffer types
-enum Buffer_IDs { ArrayBuffer, NumBuffers = 4 };
-//Buffer objects
-GLuint Buffers[NumBuffers];
 
 //Transformations
 //Relative position within world space
@@ -70,21 +63,6 @@ float deltaTime = 0.0f;
 //Last value of time change
 float lastFrame = 0.0f;
 
-// Terrain
-GLuint terrainVAO = 0;
-GLuint terrainVBO = 0;
-GLuint terrainEBO = 0;
-
-#define RENDER_DISTANCE 128 //Render width of map
-#define MAP_SIZE RENDER_DISTANCE * RENDER_DISTANCE //Size of map in x & z space
-
-//Amount of chunks across one dimension
-const int squaresRow = RENDER_DISTANCE - 1;
-//Two triangles per square to form a 1x1 chunk
-const int trianglesPerSquare = 2;
-//Amount of triangles on map
-const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare;
-
 int main()
 {
     //Initialisation of GLFW
@@ -116,27 +94,36 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
 
-
+  //  list<Shader> shaders;
     //Loading of shaders
     Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
     Shaders.use();
 
-    Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragShader.frag");
-
-    // Light properties
     Shaders.setVec3("light.position", vec3(0.0f, 0.0f, 0.0f));
     Shaders.setVec3("light.ambient", vec3(0.2f));
     Shaders.setVec3("light.diffuse", vec3(0.7f));
     Shaders.setVec3("light.specular", vec3(1.0f));
 
-
-    // Camera position (needed for specular lighting)
     Shaders.setVec3("viewPos", cameraPosition);
+  //  shaders.push_back(Shaders);
+    
+    Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragShader.frag");
+  //  shaders.push_back(TerrainShaders);
+    TerrainShaders.use();
+
+    TerrainShaders.setVec3("light.position", vec3(3.0f, -1.0f, 3.0f));
+    TerrainShaders.setVec3("light.ambient", vec3(0.2f));
+    TerrainShaders.setVec3("light.diffuse", vec3(0.7f));
+    TerrainShaders.setVec3("light.specular", vec3(0.0f));
+
+    TerrainShaders.setVec3("viewPos", cameraPosition);
+    // Light properties
+   // SetLight(shaders, 10.0f, 40.0f, 10.0f);
 
 
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palm.obj");
-
+   
 
     //Sets the viewport size within the window to match the window size of 1280x720
     glViewport(0, 0, 1280, 720);
@@ -147,153 +134,9 @@ int main()
     //Sets the mouse_callback() function as the callback for the mouse movement event
     glfwSetCursorPosCallback(window, mouse_callback);
 
-
-    //Assigning perlin noise type for map
-    FastNoiseLite TerrainNoise;
-    //Setting noise type to Perlin
-    TerrainNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    //Sets the noise scale
-    TerrainNoise.SetFrequency(0.05f);
-    //Generates a random seed between integers 0 & 100
-    int terrainSeed = rand() % 100;
-    //Sets seed for noise
-    TerrainNoise.SetSeed(terrainSeed);
-
-    //Biome noise
-    FastNoiseLite BiomeNoise;
-    BiomeNoise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-    BiomeNoise.SetFrequency(0.05f);
-    int biomeSeed = rand() % 100;
-    BiomeNoise.SetSeed(biomeSeed);
-
-    //Generation of height map vertices
-    GLfloat terrainVertices[MAP_SIZE][6];
-
-    //Terrain vertice index
-    int i = 0;
-    //Using x & y nested for loop in order to apply noise 2-dimensionally
-    for (int y = 0; y < RENDER_DISTANCE; y++)
-    {
-        for (int x = 0; x < RENDER_DISTANCE; x++)
-        {
-            //Setting of height from 2D noise value at respective x & y coordinate
-            terrainVertices[i][1] = TerrainNoise.GetNoise((float)x, (float)y);
-
-            //Retrieval of biome to set
-            float biomeValue = BiomeNoise.GetNoise((float)x, (float)y);
-
-            if (biomeValue <= -0.75f) //Plains
-            {
-                terrainVertices[i][3] = 0.0f;
-                terrainVertices[i][4] = 0.75f;
-                terrainVertices[i][5] = 0.25f;
-            }
-            else //Desert
-            {
-                terrainVertices[i][3] = 1.0f;
-                terrainVertices[i][4] = 1.0f;
-                terrainVertices[i][5] = 0.5f;
-            }
-
-            i++;
-        }
-    }
-
-    //Positions to start drawing from
-    float drawingStartPosition = 1.0f;
-    float columnVerticesOffset = drawingStartPosition;
-    float rowVerticesOffset = drawingStartPosition;
-
-    int rowIndex = 0;
-    for (int i = 0; i < MAP_SIZE; i++)
-    {
-        //Generation of x & z vertices for horizontal plane
-        terrainVertices[i][0] = columnVerticesOffset;
-        terrainVertices[i][2] = rowVerticesOffset;
-
-        //Determination of biomes based on height
-        if (terrainVertices[i][1] >= (0.5f / 8.0f))
-        {
-            //Snow
-            terrainVertices[i][3] = 1.0f;
-            terrainVertices[i][4] = 1.0f;
-            terrainVertices[i][5] = 1.0f;
-        }
-
-        //Shifts x position across for next triangle along grid
-        columnVerticesOffset = columnVerticesOffset + -0.0625f;
-
-        //Indexing of each chunk within row
-        rowIndex++;
-        //True when all triangles of the current row have been generated
-        if (rowIndex == RENDER_DISTANCE)
-        {
-            //Resets for next row of triangles
-            rowIndex = 0;
-            //Resets x position for next row of triangles
-            columnVerticesOffset = drawingStartPosition;
-            //Shifts y position
-            rowVerticesOffset = rowVerticesOffset + -0.0625f;
-        }
-    }
-
-    //Generation of height map indices
-    GLuint terrainIndices[trianglesGrid][3];
-
-    //Positions to start mapping indices from
-    int columnIndicesOffset = 0;
-    int rowIndicesOffset = 0;
-
-    //Generation of map indices in the form of chunks (1x1 right angle triangle squares)
-    int index = 0;
-    for (int x = 0; x < RENDER_DISTANCE - 1; x++)
-    {
-        for (int y = 0; y < RENDER_DISTANCE - 1; y++)
-        {
-            terrainIndices[index][0] = x * RENDER_DISTANCE + y;
-            terrainIndices[index][1] = (x + 1) * RENDER_DISTANCE + y;
-            terrainIndices[index][2] = 1 + x * RENDER_DISTANCE + y;
-            index++;
-
-            // Triangle 2 (CCW)
-            terrainIndices[index][0] = 1 + x * RENDER_DISTANCE + y;
-            terrainIndices[index][1] = (x + 1) * RENDER_DISTANCE + y;
-            terrainIndices[index][2] = 1 + (x + 1) * RENDER_DISTANCE + y;
-            index++;
-        }
-    }
-
-    //Sets index of VAO
-    glGenVertexArrays(NumVAOs, VAOs);
-    //Binds VAO to a buffer
-    glBindVertexArray(VAOs[0]);
-    //Sets indexes of all required buffer objects
-    glGenBuffers(NumBuffers, Buffers);
-    //glGenBuffers(1, &EBO);
-
-    //Binds vertex object to array buffer
-    glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
-    //Allocates buffer memory for the vertices of the 'Triangles' buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(terrainVertices), terrainVertices, GL_STATIC_DRAW);
-
-    //Binding & allocation for indices
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffers[Indices]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(terrainIndices), terrainIndices, GL_STATIC_DRAW);
-
-    //Allocation & indexing of vertex attribute memory for vertex shader
-    //Positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    //Colours
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    //Unbinding
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+    Terrain Mountains(0, 0);
+    Terrain Desert(1, 0);
+    Terrain Forest(0, 1);
     //Model matrix
     model = mat4(1.0f);
     //Scaling to zoom in
@@ -333,13 +176,12 @@ int main()
         view = lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //Sets the position of the viewer, the movement direction in relation to it & the world up direction
         model = mat4(1.0f);
         TerrainShaders.use();
-        SetMatricesNoLi(TerrainShaders);
+        SetMatrices(TerrainShaders);
 
         //Drawing
-        glBindVertexArray(VAOs[0]);
-        glDrawElements(GL_TRIANGLES, trianglesGrid * 3, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-
+        Mountains.Draw(TerrainShaders);
+        Desert.Draw(TerrainShaders);
+        Forest.Draw(TerrainShaders);
         //Rock (reorient MVP back to starting values)
         Shaders.use();
         model = mat4(1.0f);
@@ -352,9 +194,8 @@ int main()
         glActiveTexture(GL_TEXTURE0);
 
         model = mat4(1.0f);
-
-        model = scale(model, vec3(0.1f, 0.1f, 0.1f));
-        model = translate(model, vec3(10.0f, 0.0f, 10.0f));
+        model = translate(model, vec3(1.0f, -1.0f, 1.0f));
+        model = scale(model, vec3(0.01f, 0.01f, 0.01f));
         SetMatrices(Shaders);
         Tree.Draw(Shaders);
 
@@ -460,10 +301,3 @@ void SetMatrices(Shader& ShaderProgramIn)
     ShaderProgramIn.setMat3("normalMatrix", normalMatrix);
 }
 
-void SetMatricesNoLi(Shader& ShaderProgramIn)
-{
-    ShaderProgramIn.setMat4("model", model);
-    ShaderProgramIn.setMat4("view", view);
-    ShaderProgramIn.setMat4("projection", projection);
-
-}
