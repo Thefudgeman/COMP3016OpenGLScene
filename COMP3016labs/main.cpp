@@ -102,7 +102,7 @@ int main()
     Shaders.setVec3("light.position", vec3(0.0f, 1.0f, 0.0f));
     Shaders.setVec3("light.ambient", vec3(0.4f));
     Shaders.setVec3("light.diffuse", vec3(0.8f));
-    Shaders.setVec3("light.specular", vec3(0.6f));
+    Shaders.setVec3("light.specular", vec3(0.2f));
 
     Shaders.setVec3("viewPos", cameraPosition);
   //  shaders.push_back(Shaders);
