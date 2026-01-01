@@ -19,7 +19,7 @@
 
 //GENERAL
 #include "main.h"
-#include "Terrain.h"
+//#include "Terrain.h"
 
 #include "FastNoiseLite.h"
 
@@ -100,9 +100,9 @@ int main()
     Shaders.use();
 
     Shaders.setVec3("light.position", vec3(0.0f, 1.0f, 0.0f));
-    Shaders.setVec3("light.ambient", vec3(0.2f));
-    Shaders.setVec3("light.diffuse", vec3(0.7f));
-    Shaders.setVec3("light.specular", vec3(0.2f));
+    Shaders.setVec3("light.ambient", vec3(0.4f));
+    Shaders.setVec3("light.diffuse", vec3(0.8f));
+    Shaders.setVec3("light.specular", vec3(0.6f));
 
     Shaders.setVec3("viewPos", cameraPosition);
   //  shaders.push_back(Shaders);
@@ -112,8 +112,8 @@ int main()
     TerrainShaders.use();
 
     TerrainShaders.setVec3("light.position", vec3(3.0f, 1.0f, 3.0f));
-    TerrainShaders.setVec3("light.ambient", vec3(0.2f));
-    TerrainShaders.setVec3("light.diffuse", vec3(0.7f));
+    TerrainShaders.setVec3("light.ambient", vec3(0.4f));
+    TerrainShaders.setVec3("light.diffuse", vec3(0.8f));
     TerrainShaders.setVec3("light.specular", vec3(0.0f));
 
     TerrainShaders.setVec3("viewPos", cameraPosition);
@@ -124,7 +124,6 @@ int main()
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palm.obj");
     Model ForestTree("media/tree2/Small_Pine.obj");
-   
 
     //Sets the viewport size within the window to match the window size of 1280x720
     glViewport(0, 0, 1280, 720);
@@ -201,13 +200,10 @@ int main()
         Tree.Draw(Shaders);
 
         glActiveTexture(GL_TEXTURE0);
-        model = mat4(1.0f);
-        model = translate(model, vec3(2.0f, 1.0f, 0.0f));
-        model = scale(model, vec3(0.2f, 0.2f, 0.2f));
-        SetMatrices(Shaders);
 
-        ForestTree.Draw(Shaders);
-
+        DrawModel(Shaders, model, ForestTree, Forest, 1.0f, 0.0f);
+        DrawModel(Shaders, model, ForestTree, Forest, 1.0f, 1.0f);
+        DrawModel(Shaders, model, ForestTree, Forest, 3.0f, 5.0f);
 
         //Refreshing
         glfwSwapBuffers(window); //Swaps the colour buffer
@@ -308,5 +304,15 @@ void SetMatrices(Shader& ShaderProgramIn)
 
     mat3 normalMatrix = transpose(inverse(mat3(model)));
     ShaderProgramIn.setMat3("normalMatrix", normalMatrix);
+}
+
+void DrawModel(Shader& Shaders, mat4& model, Model& object, Terrain& terrain,float x, float z)
+{
+    model = mat4(1.0f);
+    model = translate(model, vec3(x + (0.0625f * 128.0f * terrain.getChunkX()), terrain.getHeight(x + (0.0625f * 128.0f * terrain.getChunkX()), z+ (0.0625f * 128.0f * terrain.getChunkZ())) - 0.02, z + (0.0625f*128.0f * terrain.getChunkZ())));
+    model = scale(model, vec3(0.2f, 0.2f, 0.2f));
+    SetMatrices(Shaders);
+
+    object.Draw(Shaders);
 }
 

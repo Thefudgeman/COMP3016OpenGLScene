@@ -20,7 +20,10 @@ uniform sampler2D texture_diffuse1;
 void main()
 {
     vec3 texColor = texture(texture_diffuse1, TexCoords).rgb;
-
+    if(texture(texture_diffuse1, TexCoords).a < 0.5)
+    {
+        discard;
+    }
     // Ambient
     vec3 ambient = light.ambient * texColor;
 

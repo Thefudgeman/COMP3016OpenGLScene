@@ -15,28 +15,42 @@ const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare;
 using namespace glm;
 using namespace std;
 
-Terrain::Terrain(int chunkX, int chunkY)
+Terrain::Terrain(int ChunkX, int ChunkZ)
 {
-    generateMesh(chunkX, chunkY);
+    //Setting noise type to Perlin
+    TerrainNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    //Sets the noise scale
+    TerrainNoise.SetFrequency(0.05f);
+    int terrainSeed = 1;
+    //Sets seed for noise
+    TerrainNoise.SetSeed(terrainSeed);
+    setChunkX(ChunkX);
+    setChunkZ(ChunkZ);
+    generateMesh();
 }
 
 Terrain::~Terrain()
 {
 
 }
-
-void Terrain::generateMesh(int chunkX, int chunkY)
+void Terrain::setChunkX(int ChunkX)
 {
-    //Assigning perlin noise type for map
-    FastNoiseLite TerrainNoise;
-    //Setting noise type to Perlin
-    TerrainNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    //Sets the noise scale
-    TerrainNoise.SetFrequency(0.05f);
-    //Generates a random seed between integers 0 & 100
-    int terrainSeed = 1;
-    //Sets seed for noise
-    TerrainNoise.SetSeed(terrainSeed);
+    chunkX = ChunkX;
+}
+void Terrain::setChunkZ(int ChunkZ)
+{
+    chunkZ = ChunkZ;
+}
+int Terrain::getChunkX()
+{
+    return chunkX;
+}
+int Terrain::getChunkZ()
+{
+    return chunkZ;
+}
+void Terrain::generateMesh()
+{
 
     struct Vertex { vec3 pos, colour, normal; };
 
@@ -45,7 +59,7 @@ void Terrain::generateMesh(int chunkX, int chunkY)
 
     const float vertexSpacing = 0.0625f;
     float chunkOffsetX = chunkX * (RENDER_DISTANCE - 1) * vertexSpacing;
-    float chunkOffsetZ = chunkY * (RENDER_DISTANCE - 1) * vertexSpacing;
+    float chunkOffsetZ = chunkZ * (RENDER_DISTANCE - 1) * vertexSpacing;
 
     //Terrain vertice index
     int i = 0;
@@ -55,12 +69,12 @@ void Terrain::generateMesh(int chunkX, int chunkY)
         for (int x = 0; x < RENDER_DISTANCE; x++, i++)
         {
             float noiseX = x + chunkX * (RENDER_DISTANCE - 1);
-            float noiseY = y + chunkY * (RENDER_DISTANCE - 1);
+            float noiseY = y + chunkZ * (RENDER_DISTANCE - 1);
             float biomeValue = TerrainNoise.GetNoise((float)x, (float)y);
             float height = TerrainNoise.GetNoise(noiseX, noiseY);
 
             //Setting of height from 2D noise value at respective x & y coordinate
-            if (chunkX == 1 || chunkY == 1 || x>120 ||y>120)
+            if (chunkX == 1 || chunkZ == 1 || x>120 ||y>120)
             {
                 terrainVertices[i].pos = vec3(x * vertexSpacing + chunkOffsetX, height/2.2f, y * vertexSpacing + chunkOffsetZ);
             }
@@ -72,7 +86,7 @@ void Terrain::generateMesh(int chunkX, int chunkY)
 
      
 
-            if (chunkX == 0 && chunkY == 0) //mountains
+            if (chunkX == 0 && chunkZ == 0) //mountains
             {
                 terrainVertices[i].colour = vec3(0.5f, 0.5f, 0.5f);
                 // Snow
@@ -81,7 +95,7 @@ void Terrain::generateMesh(int chunkX, int chunkY)
                     terrainVertices[i].colour = vec3(1.0f);
                 }
             }
-            else if (chunkX == 1 && chunkY == 0) //desert
+            else if (chunkX == 1 && chunkZ == 0) //desert
             {
                 terrainVertices[i].colour = vec3(1.0f, 1.0f, 0.5f);
             }
@@ -185,4 +199,23 @@ void Terrain::Draw(Shader& shader)
     glBindVertexArray(VAOs[0]);
     glDrawElements(GL_TRIANGLES, trianglesGrid * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+float Terrain::getHeight(float localX, float localZ)
+{
+    const float vertexSpacing = 0.0625f;
+
+    float worldX = localX / vertexSpacing;
+    float worldZ = localZ / vertexSpacing;
+
+    float height = TerrainNoise.GetNoise(worldX, worldZ);
+
+    if (chunkX == 1 || chunkZ == 1 ||
+        fmod(worldX, RENDER_DISTANCE) > 120 ||
+        fmod(worldZ, RENDER_DISTANCE) > 120)
+    {
+        height /= 2.2f;
+    }
+
+    return height;
 }
