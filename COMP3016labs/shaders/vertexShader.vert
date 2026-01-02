@@ -1,8 +1,8 @@
 #version 460
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoords;
+layout (location = 0) in vec3 posIn;
+layout (location = 1) in vec3 normalIn;
+layout (location = 2) in vec2 texCoordsIn;
 
 out vec3 FragPos;
 out vec3 Normal;
@@ -15,9 +15,9 @@ uniform mat3 normalMatrix;
 
 void main()
 {
-    FragPos = vec3(model * vec4(aPos, 1.0));
-    Normal  = normalize(normalMatrix * aNormal);
-    TexCoords = aTexCoords;
+    FragPos = vec3(model * vec4(posIn, 1.0));
+    Normal  = normalize(normalMatrix * normalIn);
+    TexCoords = texCoordsIn;
 
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }

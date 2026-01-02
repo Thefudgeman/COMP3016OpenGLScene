@@ -50,7 +50,6 @@ bool mouseFirstEntry = true;
 float cameraLastXPos = 800.0f / 2.0f;
 float cameraLastYPos = 600.0f / 2.0f;
 
-
 //Model-View-Projection Matrix
 mat4 mvp;
 mat4 model;
@@ -101,8 +100,8 @@ int main()
 
     Shaders.setVec3("light.position", vec3(0.0f, 1.0f, 0.0f));
     Shaders.setVec3("light.ambient", vec3(0.4f));
-    Shaders.setVec3("light.diffuse", vec3(0.8f));
-    Shaders.setVec3("light.specular", vec3(0.2f));
+    Shaders.setVec3("light.diffuse", vec3(0.6f));
+    Shaders.setVec3("light.specular", vec3(0.0f));
 
     Shaders.setVec3("viewPos", cameraPosition);
   //  shaders.push_back(Shaders);
@@ -120,9 +119,8 @@ int main()
     // Light properties
    // SetLight(shaders, 10.0f, 40.0f, 10.0f);
 
-
     Model Rock("media/rock/Rock07-Base.obj");
-    Model Tree("media/tree/palm.obj");
+    Model Tree("media/tree/palm2.obj");
     Model ForestTree("media/tree2/Small_Pine.obj");
 
     //Sets the viewport size within the window to match the window size of 1280x720
@@ -201,9 +199,37 @@ int main()
 
         glActiveTexture(GL_TEXTURE0);
 
-        DrawModel(Shaders, model, ForestTree, Forest, 1.0f, 0.0f);
-        DrawModel(Shaders, model, ForestTree, Forest, 1.0f, 1.0f);
-        DrawModel(Shaders, model, ForestTree, Forest, 3.0f, 5.0f);
+        DrawModel(Shaders, model, ForestTree, Forest, 1.2f, 7.3f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 5.8f, 0.6f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 3.1f, 2.9f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 0.4f, 6.7f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 7.5f, 3.3f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 2.2f, 1.1f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 6.6f, 4.5f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 0.9f, 7.8f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 4.0f, 5.2f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 3.7f, 0.2f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 1.5f, 6.9f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 7.1f, 2.6f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 5.0f, 7.0f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 2.8f, 4.4f, 0.2f);
+        DrawModel(Shaders, model, ForestTree, Forest, 0.3f, 3.9f, 0.2f);
+
+        DrawModel(Shaders, model, Tree, Desert, 1.2f, 7.3f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 5.8f, 0.6f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 3.1f, 2.9f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 0.4f, 6.7f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 7.5f, 3.3f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 2.2f, 1.1f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 6.6f, 4.5f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 0.9f, 7.8f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 4.0f, 5.2f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 3.7f, 0.2f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 1.5f, 6.9f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 7.1f, 2.6f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 5.0f, 7.0f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 2.8f, 4.4f, 0.1f);
+        DrawModel(Shaders, model, Tree, Desert, 0.3f, 3.9f, 0.1f);
 
         //Refreshing
         glfwSwapBuffers(window); //Swaps the colour buffer
@@ -306,11 +332,11 @@ void SetMatrices(Shader& ShaderProgramIn)
     ShaderProgramIn.setMat3("normalMatrix", normalMatrix);
 }
 
-void DrawModel(Shader& Shaders, mat4& model, Model& object, Terrain& terrain,float x, float z)
+void DrawModel(Shader& Shaders, mat4& model, Model& object, Terrain& terrain,float x, float z, float scaleSize)
 {
     model = mat4(1.0f);
     model = translate(model, vec3(x + (0.0625f * 128.0f * terrain.getChunkX()), terrain.getHeight(x + (0.0625f * 128.0f * terrain.getChunkX()), z+ (0.0625f * 128.0f * terrain.getChunkZ())) - 0.02, z + (0.0625f*128.0f * terrain.getChunkZ())));
-    model = scale(model, vec3(0.2f, 0.2f, 0.2f));
+    model = scale(model, vec3(scaleSize, scaleSize, scaleSize));
     SetMatrices(Shaders);
 
     object.Draw(Shaders);

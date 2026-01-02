@@ -22,5 +22,5 @@ void ProcessUserInput(GLFWwindow* WindowIn);
 //Sets the model-view-projection matrix
 void SetMatrices(Shader& ShaderProgramIn);
 
-void DrawModel(Shader& Shaders, glm::mat4& model, Model& object, Terrain& terrain, float x, float z);
+void DrawModel(Shader& Shaders, glm::mat4& model, Model& object, Terrain& terrain, float x, float z, float scaleSize);
 GLuint program;

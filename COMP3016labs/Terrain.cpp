@@ -73,8 +73,7 @@ void Terrain::generateMesh()
             float biomeValue = TerrainNoise.GetNoise((float)x, (float)y);
             float height = TerrainNoise.GetNoise(noiseX, noiseY);
 
-            //Setting of height from 2D noise value at respective x & y coordinate
-            if (chunkX == 1 || chunkZ == 1 || x>120 ||y>120)
+            if (chunkX == 1 || chunkZ == 1 || x>120 ||y>120) //connects the bimes while letting desert and forest biomes to have less height variation
             {
                 terrainVertices[i].pos = vec3(x * vertexSpacing + chunkOffsetX, height/2.2f, y * vertexSpacing + chunkOffsetZ);
             }
@@ -123,12 +122,12 @@ void Terrain::generateMesh()
         {
             terrainIndices[index][0] = y * RENDER_DISTANCE + x;
             terrainIndices[index][1] = y * RENDER_DISTANCE + x + RENDER_DISTANCE;
-            terrainIndices[index][2] = y * RENDER_DISTANCE + x + 1;
+            terrainIndices[index][2] = 1 + y * RENDER_DISTANCE + x;
             index++;
 
-            terrainIndices[index][0] = y * RENDER_DISTANCE + x + 1;
+            terrainIndices[index][0] = 1 + y * RENDER_DISTANCE + x;
             terrainIndices[index][1] = y * RENDER_DISTANCE + x + RENDER_DISTANCE;
-            terrainIndices[index][2] = y * RENDER_DISTANCE + x + RENDER_DISTANCE + 1;
+            terrainIndices[index][2] = 1 + y * RENDER_DISTANCE + x + RENDER_DISTANCE;
             index++;
         }
     }
