@@ -101,8 +101,7 @@ int main()
     Shaders.setVec3("light.position", vec3(0.0f, 1.0f, 0.0f));
     Shaders.setVec3("light.ambient", vec3(0.4f));
     Shaders.setVec3("light.diffuse", vec3(0.6f));
-    Shaders.setVec3("light.specular", vec3(0.0f));
-
+    Shaders.setVec3("light.specular", vec3(0.2f));
     Shaders.setVec3("viewPos", cameraPosition);
   //  shaders.push_back(Shaders);
     
@@ -113,14 +112,14 @@ int main()
     TerrainShaders.setVec3("light.position", vec3(3.0f, 1.0f, 3.0f));
     TerrainShaders.setVec3("light.ambient", vec3(0.4f));
     TerrainShaders.setVec3("light.diffuse", vec3(0.8f));
-    TerrainShaders.setVec3("light.specular", vec3(0.0f));
+    TerrainShaders.setVec3("light.specular", vec3(0.2f));
 
     TerrainShaders.setVec3("viewPos", cameraPosition);
     // Light properties
    // SetLight(shaders, 10.0f, 40.0f, 10.0f);
 
     Model Rock("media/rock/Rock07-Base.obj");
-    Model Tree("media/tree/palm2.obj");
+    Model Tree("media/tree/palmf.fbx");
     Model ForestTree("media/tree2/Small_Pine.obj");
 
     //Sets the viewport size within the window to match the window size of 1280x720
@@ -338,7 +337,6 @@ void DrawModel(Shader& Shaders, mat4& model, Model& object, Terrain& terrain,flo
     model = translate(model, vec3(x + (0.0625f * 128.0f * terrain.getChunkX()), terrain.getHeight(x + (0.0625f * 128.0f * terrain.getChunkX()), z+ (0.0625f * 128.0f * terrain.getChunkZ())) - 0.02, z + (0.0625f*128.0f * terrain.getChunkZ())));
     model = scale(model, vec3(scaleSize, scaleSize, scaleSize));
     SetMatrices(Shaders);
-
     object.Draw(Shaders);
 }
 
