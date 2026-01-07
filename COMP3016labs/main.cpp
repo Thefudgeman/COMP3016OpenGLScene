@@ -19,7 +19,6 @@
 
 //GENERAL
 #include "main.h"
-//#include "Terrain.h"
 
 #include "FastNoiseLite.h"
 
@@ -30,6 +29,7 @@ using namespace glm;
 int windowWidth;
 int windowHeight;
 
+#define _USE_MATH_DEFINES
 
 
 //Transformations
@@ -98,10 +98,10 @@ int main()
     Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
     Shaders.use();
 
-    Shaders.setVec3("light.position", vec3(0.0f, 1.0f, 0.0f));
+    Shaders.setVec3("light.position", vec3(128.0f*0.0625f, 1.0f, 0.0f));
     Shaders.setVec3("light.ambient", vec3(0.4f));
-    Shaders.setVec3("light.diffuse", vec3(0.6f));
-    Shaders.setVec3("light.specular", vec3(0.2f));
+    Shaders.setVec3("light.diffuse", vec3(0.4f));
+    Shaders.setVec3("light.specular", vec3(0.8f));
     Shaders.setVec3("viewPos", cameraPosition);
   //  shaders.push_back(Shaders);
     
@@ -109,10 +109,10 @@ int main()
   //  shaders.push_back(TerrainShaders);
     TerrainShaders.use();
 
-    TerrainShaders.setVec3("light.position", vec3(3.0f, 1.0f, 3.0f));
+    TerrainShaders.setVec3("light.position", vec3(128.0f * 0.0625f, 1.0f, 0.0f));
     TerrainShaders.setVec3("light.ambient", vec3(0.4f));
     TerrainShaders.setVec3("light.diffuse", vec3(0.8f));
-    TerrainShaders.setVec3("light.specular", vec3(0.2f));
+    TerrainShaders.setVec3("light.specular", vec3(0.0f));
 
     TerrainShaders.setVec3("viewPos", cameraPosition);
     // Light properties
@@ -121,6 +121,8 @@ int main()
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palmf.fbx");
     Model ForestTree("media/tree2/Small_Pine.obj");
+
+
 
     //Sets the viewport size within the window to match the window size of 1280x720
     glViewport(0, 0, 1280, 720);
@@ -197,6 +199,7 @@ int main()
         Tree.Draw(Shaders);
 
         glActiveTexture(GL_TEXTURE0);
+        Shaders.setBool("ForestTree", true);
 
         DrawModel(Shaders, model, ForestTree, Forest, 1.2f, 7.3f, 0.2f);
         DrawModel(Shaders, model, ForestTree, Forest, 5.8f, 0.6f, 0.2f);
@@ -213,7 +216,9 @@ int main()
         DrawModel(Shaders, model, ForestTree, Forest, 5.0f, 7.0f, 0.2f);
         DrawModel(Shaders, model, ForestTree, Forest, 2.8f, 4.4f, 0.2f);
         DrawModel(Shaders, model, ForestTree, Forest, 0.3f, 3.9f, 0.2f);
-
+        
+        
+        Shaders.setBool("ForestTree", false);
         DrawModel(Shaders, model, Tree, Desert, 1.2f, 7.3f, 0.1f);
         DrawModel(Shaders, model, Tree, Desert, 5.8f, 0.6f, 0.1f);
         DrawModel(Shaders, model, Tree, Desert, 3.1f, 2.9f, 0.1f);

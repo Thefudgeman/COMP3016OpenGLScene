@@ -10,7 +10,6 @@
 #include "FastNoiseLite.h"
 #include "Terrain.h"
 
-
 //Called on window resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 //Called on mouse movement
