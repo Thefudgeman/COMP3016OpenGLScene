@@ -165,7 +165,7 @@ void Terrain::generateMesh()
 
     //Binds vertex object to array buffer
     glBindBuffer(GL_ARRAY_BUFFER, Buffers[Triangles]);
-    //Allocates buffer memory for the vertices of the 'Triangles' buffer
+    //Allocates buffer memory for the vertices of the Triangles buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(terrainVertices), terrainVertices, GL_STATIC_DRAW);
 
     //Binding & allocation for indices
