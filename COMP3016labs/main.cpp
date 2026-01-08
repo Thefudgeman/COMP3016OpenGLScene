@@ -120,7 +120,7 @@ int main()
 
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palmf.fbx");
-    Model ForestTree("media/tree2/Small_Pine.obj");
+    Model ForestTree("media/ForestTree/Small_Pine.obj");
     Model Signature("media/jd_vance_south_park/scene.gltf");
 
 
