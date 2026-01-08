@@ -121,6 +121,7 @@ int main()
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palmf.fbx");
     Model ForestTree("media/tree2/Small_Pine.obj");
+    Model Signature("media/jd_vance_south_park/scene.gltf");
 
 
 
@@ -183,20 +184,8 @@ int main()
         Forest.Draw(TerrainShaders);
         //Rock (reorient MVP back to starting values)
         Shaders.use();
-        model = mat4(1.0f);
-        model = translate(model, vec3(0.1f, 0.1f, 0.1f));
-        model = scale(model, vec3(0.001f, 0.001f, 0.001f));
-        SetMatrices(Shaders);
-        Rock.Draw(Shaders);
 
         //Tree (changes MVP in relation to past values)
-        glActiveTexture(GL_TEXTURE0);
-
-        model = mat4(1.0f);
-        model = translate(model, vec3(-1.0f, 0.0f, 1.0f));
-        model = scale(model, vec3(0.1f, 0.1f, 0.1f));
-        SetMatrices(Shaders);
-        Tree.Draw(Shaders);
 
         glActiveTexture(GL_TEXTURE0);
         Shaders.setBool("ForestTree", true);
@@ -234,7 +223,12 @@ int main()
         DrawModel(Shaders, model, Tree, Desert, 5.0f, 7.0f, 0.1f);
         DrawModel(Shaders, model, Tree, Desert, 2.8f, 4.4f, 0.1f);
         DrawModel(Shaders, model, Tree, Desert, 0.3f, 3.9f, 0.1f);
-
+        
+        model = mat4(1.0f);
+        model = translate(model, vec3(2.5f, -0.8f, 0.5f)); //draw signature under the terrain DrawModel() draws ontop of it
+        model = scale(model, vec3(0.1f, 0.1f, 0.1f));
+        SetMatrices(Shaders);
+        Signature.Draw(Shaders);
         //Refreshing
         glfwSwapBuffers(window); //Swaps the colour buffer
         glfwPollEvents(); //Queries all GLFW events
