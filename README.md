@@ -3,6 +3,7 @@
 ## Instructions
 To run executable extract COMP3016CW2 exe and run COMP3016OpenGLScene.exe
 For source code extract COMP3016CW2 and click on COMP3016OpenGLScene.sln
+model.h from learnopengl has been changed as shown in Lab 9 e - Rock model files on the dle at 1:08
 
 ## Dependencies used
 glfw3.lib,
