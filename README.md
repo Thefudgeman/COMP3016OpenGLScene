@@ -1,5 +1,9 @@
 # COMP3016CW2
 
+## Instructions
+To run executable extract COMP3016CW2 exe and run COMP3016OpenGLScene.exe
+For source code extract COMP3016CW2 and click on COMP3016OpenGLScene.sln
+
 ## Dependencies used
 glfw3.lib,
 glfw3_mt.lib,
