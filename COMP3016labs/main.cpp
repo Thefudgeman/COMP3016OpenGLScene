@@ -69,7 +69,7 @@ int main()
     //Initialisation of 'GLFWwindow' object
     windowWidth = 1280;
     windowHeight = 720;
-    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Lab5", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "COMP3016CW2", NULL, NULL);
 
     //Checks if window has been successfully instantiated
     if (window == NULL)
