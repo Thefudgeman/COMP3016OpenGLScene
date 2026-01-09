@@ -6,9 +6,11 @@ glfw3_mt.lib,
 glfw3dll.lib,
 opengl32.lib,
 assimp-vc143-mt.lib </br>
-Include directories Public/OpenGL/include with GL, glad, GLFW, glm, KHR and learnopengl </br>
+Include directories:</br>
+Public/OpenGL/include with GL, glad, GLFW, glm, KHR and learnopengl </br>
 Public/Asspim/Binaries/include </br>
-Library directories Public/OpenGL/lib </br>
+Library directories:</br>
+Public/OpenGL/lib </br>
 Public/Assimp/Binaries/lib/Release
 ## Description
 In the scene I have created there are three biomes. There is a mountain, desert and forest where the desert has palm trees made of money and gold and the forest has some regular trees. The palm trees have a roughness and metallic texture mixed with the base colour so that the lighting give a better effect. This is mostly for the specular lighting to make the gold shine while the money leave do not. The mountains biome has a larger height variation and has snow on the highest parts while the forest biome has a lower heigh variation and has water at the lowest parts. For the signature there is a model of what JD Vance looked like in south park under the mountains biome. There is WASD and mouse controls to move around the scene.
