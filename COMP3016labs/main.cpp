@@ -118,7 +118,6 @@ int main()
     // Light properties
    // SetLight(shaders, 10.0f, 40.0f, 10.0f);
 
-    Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palmf.fbx");
     Model ForestTree("media/ForestTree/Small_Pine.obj");
     Model Signature("media/jd_vance_south_park/scene.gltf");
