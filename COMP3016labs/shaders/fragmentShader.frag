@@ -43,7 +43,7 @@ void main()
 
     // Specular
 
-    vec3 specular = new vec3(0.0,0.0,0.0);
+    vec3 specular = vec3(0.0,0.0,0.0);
 
     if(!ForestTree) //makes sure ForestTree model has no specular lighting otherwise some leaves appear very bright
     {
